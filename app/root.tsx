@@ -48,8 +48,29 @@ export default function App() {
 export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
   // Игнорируем 404 ошибки для системных путей (Chrome DevTools и т.д.)
   if (isRouteErrorResponse(error) && error.status === 404) {
-    // В режиме разработки просто игнорируем эти ошибки
+    // В режиме разработки тихо игнорируем системные запросы
     if (import.meta.env.DEV) {
+      // Проверяем, является ли это системным запросом по сообщению об ошибке
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      if (
+        errorMessage.includes(".well-known") ||
+        errorMessage.includes("favicon") ||
+        errorMessage.includes("robots.txt")
+      ) {
+        return null;
+      }
+    }
+  }
+
+  // Также проверяем обычные ошибки на системные пути
+  if (error && error instanceof Error) {
+    const errorMessage = error.message;
+    if (
+      import.meta.env.DEV &&
+      (errorMessage.includes(".well-known") ||
+        errorMessage.includes("No route matches") ||
+        errorMessage.includes("favicon"))
+    ) {
       return null;
     }
   }
