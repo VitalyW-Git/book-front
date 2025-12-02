@@ -3,7 +3,7 @@ import { ItemInterface } from "../../common/interface";
 import { itemsApi } from "../../common/services/itemsApi";
 import { ITEMS_PER_PAGE, FILTER_DEBOUNCE_MS } from "../../common/constants/api";
 
-export const useItems = (excludeSelected: boolean = true) => {
+export const useItems = () => {
   const [items, setItems] = useState<ItemInterface[]>([]);
   const [page, setPage] = useState(1);
   const [filter, setFilter] = useState("");
@@ -11,24 +11,18 @@ export const useItems = (excludeSelected: boolean = true) => {
   const [loading, setLoading] = useState(false);
   const observerRef = useRef<HTMLDivElement>(null);
   const loadingRef = useRef(false);
-  const excludeSelectedRef = useRef(excludeSelected);
   const filterRef = useRef(filter);
   const pageRef = useRef(page);
   const hasMoreRef = useRef(hasMore);
 
-  excludeSelectedRef.current = excludeSelected;
-  filterRef.current = filter;
-  pageRef.current = page;
-  hasMoreRef.current = hasMore;
-
   const loadItems = useCallback(
-    async (pageNum: number, filterId?: string, reset = false) => {
+    async (pageNum: number, filterId?: string, reset: boolean = false) => {
       if (loadingRef.current) return;
       loadingRef.current = true;
       setLoading(true);
 
       try {
-        const data = await itemsApi.getItems(pageNum, ITEMS_PER_PAGE, excludeSelectedRef.current, filterId);
+        const data = await itemsApi.getItems(pageNum, ITEMS_PER_PAGE, filterId);
         if (reset) {
           setItems(data.items);
         } else {
@@ -38,6 +32,7 @@ export const useItems = (excludeSelected: boolean = true) => {
             return [...prev, ...newItems];
           });
         }
+        console.log(data.hasMore)
         setHasMore(data.hasMore);
         hasMoreRef.current = data.hasMore;
         setPage(pageNum);

@@ -6,10 +6,10 @@ import { ITEMS_PER_PAGE, FILTER_DEBOUNCE_MS } from "../../common/constants/api";
 
 export const useSelectedItems = () => {
   const [items, setItems] = useState<ItemInterface[]>([]);
-  const [page, setPage] = useState(1);
-  const [filter, setFilter] = useState("");
-  const [hasMore, setHasMore] = useState(true);
-  const [loading, setLoading] = useState(false);
+  const [page, setPage] = useState<number>(1);
+  const [filter, setFilter] = useState<string>("");
+  const [hasMore, setHasMore] = useState<boolean>(true);
+  const [loading, setLoading] = useState<boolean>(false);
   const [selectedOrder, setSelectedOrder] = useState<number[]>([]);
   const [draggedItem, setDraggedItem] = useState<ItemInterface | null>(null);
   const observerRef = useRef<HTMLDivElement>(null);
@@ -17,10 +17,6 @@ export const useSelectedItems = () => {
   const filterRef = useRef(filter);
   const pageRef = useRef(page);
   const hasMoreRef = useRef(hasMore);
-
-  filterRef.current = filter;
-  pageRef.current = page;
-  hasMoreRef.current = hasMore;
 
   const loadItems = useCallback(
     async (pageNum: number, filterId?: string, reset = false) => {

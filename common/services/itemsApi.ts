@@ -6,11 +6,10 @@ export interface StateResponse {
 }
 
 export const itemsApi = {
-  getItems: async (page: number, limit: number, excludeSelected: boolean, filterId?: string): Promise<ItemsResponseInterface> => {
+  getItems: async (page: number, limit: number, filterId?: string): Promise<ItemsResponseInterface> => {
     const params = new URLSearchParams({
       page: page.toString(),
       limit: limit.toString(),
-      excludeSelected: excludeSelected.toString(),
     });
     if (filterId) {
       params.append("filterId", filterId);

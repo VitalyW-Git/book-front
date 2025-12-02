@@ -16,7 +16,7 @@ export function meta({}: Route.MetaArgs) {
 }
 
 export default function Items() {
-  const leftItems = useItems(true);
+  const leftItems = useItems();
   const rightItems = useSelectedItems();
 
   const handleSelectItem = async (item: ItemInterface) => {
