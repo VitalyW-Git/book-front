@@ -1,23 +1,10 @@
 import { useState, useEffect, useRef, useCallback } from "react";
+
+import { ItemInterface, SelectedResponseInterface, ItemsResponseInterface } from "../../common/interface";
+
 import type { Route } from "./+types/items";
 
-const API_URL = "http://localhost:3000/api/items";
-
-interface Item {
-  id: number;
-}
-
-interface ItemsResponse {
-  items: Item[];
-  total: number;
-  page: number;
-  limit: number;
-  hasMore: boolean;
-}
-
-interface SelectedResponse extends ItemsResponse {
-  order: number[];
-}
+const API_URL = import.meta.env.VITE_API_URL;
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -27,8 +14,8 @@ export function meta({}: Route.MetaArgs) {
 }
 
 export default function Items() {
-  const [leftItems, setLeftItems] = useState<Item[]>([]);
-  const [rightItems, setRightItems] = useState<Item[]>([]);
+  const [leftItems, setLeftItems] = useState<ItemInterface[]>([]);
+  const [rightItems, setRightItems] = useState<ItemInterface[]>([]);
   const [leftPage, setLeftPage] = useState(1);
   const [rightPage, setRightPage] = useState(1);
   const [leftFilter, setLeftFilter] = useState("");
@@ -38,7 +25,7 @@ export default function Items() {
   const [leftLoading, setLeftLoading] = useState(false);
   const [rightLoading, setRightLoading] = useState(false);
   const [newItemId, setNewItemId] = useState("");
-  const [draggedItem, setDraggedItem] = useState<Item | null>(null);
+  const [draggedItem, setDraggedItem] = useState<ItemInterface | null>(null);
   const [selectedOrder, setSelectedOrder] = useState<number[]>([]);
 
   const leftObserverRef = useRef<HTMLDivElement>(null);
@@ -81,8 +68,7 @@ export default function Items() {
       }
 
       const response = await fetch(`${API_URL}?${params}`);
-      const data: ItemsResponse = await response.json();
-
+      const data: ItemsResponseInterface = await response.json();
       if (reset) {
         setLeftItems(data.items);
       } else {
@@ -116,7 +102,7 @@ export default function Items() {
       }
 
       const response = await fetch(`${API_URL}/selected?${params}`);
-      const data: SelectedResponse = await response.json();
+      const data: SelectedResponseInterface = await response.json();
 
       if (reset) {
         setRightItems(data.items);
@@ -225,7 +211,7 @@ export default function Items() {
   };
 
   // Выбор элемента
-  const handleSelectItem = async (item: Item) => {
+  const handleSelectItem = async (item: ItemInterface) => {
     try {
       await fetch(`${API_URL}/selected`, {
         method: "PUT",
@@ -258,7 +244,7 @@ export default function Items() {
   };
 
   // Снятие выбора элемента
-  const handleDeselectItem = async (item: Item) => {
+  const handleDeselectItem = async (item: ItemInterface) => {
     try {
       await fetch(`${API_URL}/selected`, {
         method: "PUT",
@@ -286,7 +272,7 @@ export default function Items() {
   };
 
   // Drag & Drop обработчики
-  const handleDragStart = (item: Item, index: number) => {
+  const handleDragStart = (item: ItemInterface, index: number) => {
     setDraggedItem(item);
   };
 
@@ -294,7 +280,7 @@ export default function Items() {
     e.preventDefault();
   };
 
-  const handleDrop = async (e: React.DragEvent, targetItem: Item, targetIndex: number) => {
+  const handleDrop = async (e: React.DragEvent, targetItem: ItemInterface, targetIndex: number) => {
     e.preventDefault();
     if (!draggedItem || draggedItem.id === targetItem.id) {
       setDraggedItem(null);
