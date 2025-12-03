@@ -34,7 +34,6 @@ export const useItems = () => {
         console.error("Error loading items:", error);
       } finally {
         loadingRef.current = false;
-
       }
     },
     []

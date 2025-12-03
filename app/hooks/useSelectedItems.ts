@@ -6,24 +6,19 @@ import { ITEMS_PER_PAGE, FILTER_DEBOUNCE_MS } from "../../common/constants/api";
 
 export const useSelectedItems = () => {
   const [items, setItems] = useState<ItemInterface[]>([]);
-  const [page, setPage] = useState<number>(1);
   const [filter, setFilter] = useState<string>("");
-  const [total, setTotal] = useState<number>(0);
-  const [loading, setLoading] = useState<boolean>(false);
   const [selectedOrder, setSelectedOrder] = useState<number[]>([]);
   const [draggedItem, setDraggedItem] = useState<ItemInterface | null>(null);
   const observerRef = useRef<HTMLDivElement>(null);
   const loadingRef = useRef(false);
   const filterRef = useRef(filter);
-  const pageRef = useRef(page);
-  const totalRef = useRef(total);
+  const pageRef = useRef(1);
+  const totalRef = useRef(0);
 
   const loadItems = useCallback(
-    async (pageNum: number, filterId?: string, reset = false) => {
+    async (pageNum: number, filterId?: string, reset: boolean = false) => {
       if (loadingRef.current) return;
       loadingRef.current = true;
-      setLoading(true);
-
       try {
         const data = await itemsApi.getSelectedItems(pageNum, ITEMS_PER_PAGE, filterId);
         if (reset) {
@@ -36,15 +31,12 @@ export const useSelectedItems = () => {
             return [...prev, ...newItems];
           });
         }
-        setTotal(data.total);
         totalRef.current = data.total;
-        setPage(pageNum);
         pageRef.current = pageNum;
       } catch (error) {
         console.error("Error loading selected items:", error);
       } finally {
         loadingRef.current = false;
-        setLoading(false);
       }
     },
     []
@@ -79,7 +71,6 @@ export const useSelectedItems = () => {
     if (observerRef.current) {
       observer.observe(observerRef.current);
     }
-
     return () => observer.disconnect();
   }, [loadItems]);
 
@@ -142,8 +133,8 @@ export const useSelectedItems = () => {
     items,
     filter,
     setFilter,
-    loading,
-    total,
+    loading: loadingRef.current,
+    total: totalRef.current,
     observerRef,
     selectedOrder,
     draggedItem,
