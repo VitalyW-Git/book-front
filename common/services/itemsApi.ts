@@ -1,13 +1,8 @@
 import { API_URL } from "../constants/api";
 import {
-  ItemInterface,
   ItemsResponseInterface,
   SelectedResponseInterface,
 } from "../interface";
-
-export interface StateResponse {
-  selectedOrder: number[];
-}
 
 export const itemsApi = {
   getItems: async (

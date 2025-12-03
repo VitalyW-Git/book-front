@@ -60,10 +60,7 @@ export default function Items() {
       return;
     }
 
-    rightItems.reorderItems(
-      draggedIndex,
-      targetIndex
-    );
+    rightItems.reorderItems(draggedIndex, targetIndex);
     rightItems.setDraggedItem(null);
   };
 

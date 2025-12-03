@@ -39,7 +39,6 @@ export const useItems = () => {
         }
         totalRef.current = data.total;
         pageRef.current = pageNum;
-        console.log(itemsRef.current);
       } catch (error) {
         console.error("Error loading items:", error);
       } finally {
@@ -86,7 +85,6 @@ export const useItems = () => {
   }, [filter, loadItems]);
 
   const removeItem = useCallback((itemId: number) => {
-    console.log(itemId);
     itemsRef.current = itemsRef.current.filter(
       (item: ItemInterface) => item.id !== itemId
     );

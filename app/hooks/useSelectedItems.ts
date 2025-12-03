@@ -5,10 +5,10 @@ import { localStorageService } from "../../common/utils/localStorage";
 import { ITEMS_PER_PAGE } from "../../common/constants/api";
 
 export const useSelectedItems = () => {
-  const [_, setItemsVersion] = useState(0);
+  const [, setItemsVersion] = useState(0);
   const itemsRef = useRef<ItemInterface[]>([]);
   const [filter, setFilter] = useState<string | null>(null);
-  const [selectedOrder, setSelectedOrder] = useState<number[]>([]);
+  const [, setSelectedOrder] = useState<number[]>([]);
   const [draggedItem, setDraggedItem] = useState<ItemInterface | null>(null);
   const observerRef = useRef<HTMLDivElement>(null);
   const loadingRef = useRef<boolean>(false);
@@ -47,7 +47,6 @@ export const useSelectedItems = () => {
 
         totalRef.current = data.total;
         pageRef.current = pageNum;
-        console.log(itemsRef.current);
       } catch (error) {
         console.error("Error loading selected items:", error);
       } finally {
@@ -133,20 +132,19 @@ export const useSelectedItems = () => {
   );
 
   const reorderItems = useCallback(
-    async (
-      draggedIndex: number,
-      targetIndex: number
-    ) => {
+    async (draggedIndex: number, targetIndex: number) => {
       const newItems = [...itemsRef.current];
       const [removed] = newItems.splice(draggedIndex, 1);
       newItems.splice(targetIndex, 0, removed);
       updateItems(() => newItems);
 
       try {
-        const ids: number[] = newItems.map((item: ItemInterface) => item.id);
-        setSelectedOrder(ids);
-        await itemsApi.reorderItems(ids);
-        localStorageService.saveState({ selectedOrder: ids });
+        const newOrder: number[] = newItems.map(
+          (item: ItemInterface) => item.id
+        );
+        setSelectedOrder(newOrder);
+        await itemsApi.reorderItems(newOrder);
+        localStorageService.saveState({ selectedOrder: newOrder });
       } catch (error) {
         console.error("Error reordering items:", error);
       }
@@ -161,7 +159,6 @@ export const useSelectedItems = () => {
     loading: loadingRef.current,
     total: totalRef.current,
     observerRef,
-    selectedOrder,
     draggedItem,
     setDraggedItem,
     addItem,
