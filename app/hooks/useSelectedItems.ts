@@ -64,7 +64,7 @@ export const useSelectedItems = () => {
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
-        if (entries[0].isIntersecting && itemsRef.current.length < totalRef.current && !loadingRef.current) {
+        if (entries[0].isIntersecting && !!itemsRef.current.length && itemsRef.current.length < totalRef.current && !loadingRef.current) {
           loadItems(pageRef.current + 1, filterRef.current || undefined);
         }
       },
@@ -118,20 +118,10 @@ export const useSelectedItems = () => {
       updateItems(() => newItems);
 
       try {
-        const state = await itemsApi.fetchState();
-        const fullOrder = [...state.selectedOrder];
-
-        const draggedPosInFull = fullOrder.indexOf(draggedItemId);
-        const targetPosInFull = fullOrder.indexOf(targetItemId);
-
-        if (draggedPosInFull !== -1 && targetPosInFull !== -1) {
-          fullOrder.splice(draggedPosInFull, 1);
-          fullOrder.splice(targetPosInFull, 0, draggedItemId);
-
-          setSelectedOrder(fullOrder);
-          await itemsApi.reorderItems(fullOrder);
-          localStorageService.saveState({ selectedOrder: fullOrder });
-        }
+          const ids: number[] = newItems.map((item: ItemInterface) => item.id)
+          setSelectedOrder(ids);
+          await itemsApi.reorderItems(ids);
+          localStorageService.saveState({ selectedOrder: ids });
       } catch (error) {
         console.error("Error reordering items:", error);
       }

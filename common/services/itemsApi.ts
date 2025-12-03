@@ -68,10 +68,5 @@ export const itemsApi = {
       body: JSON.stringify({ action: "reorder", order }),
     });
   },
-
-  fetchState: async (): Promise<StateResponse> => {
-    const response = await fetch(`${API_URL}/state`);
-    return response.json();
-  },
 };
 

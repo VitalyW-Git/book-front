@@ -55,7 +55,7 @@ export const useItems = () => {
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
-        if (entries[0].isIntersecting && itemsRef.current.length < totalRef.current && !loadingRef.current) {
+        if (entries[0].isIntersecting && !!itemsRef.current.length && itemsRef.current.length < totalRef.current && !loadingRef.current) {
           loadItems(pageRef.current + 1, filterRef.current || undefined);
         }
       },
