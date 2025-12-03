@@ -2,7 +2,7 @@ import { ItemInterface } from "../../common/interface";
 
 interface ItemsListProps {
   items: ItemInterface[];
-  filter: string;
+  filter: string|null;
   onFilterChange: (value: string) => void;
   loading: boolean;
   total: number;

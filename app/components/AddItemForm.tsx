@@ -1,15 +1,12 @@
 import { useState } from "react";
 import { itemsApi } from "../../common/services/itemsApi";
+import { AddItemFormPropsInterface } from "../../common/interface";
 
-interface AddItemFormProps {
-  onItemAdded: () => void;
-}
-
-export const AddItemForm = ({ onItemAdded }: AddItemFormProps) => {
-  const [newItemId, setNewItemId] = useState("");
+export const AddItemForm = ({ onItemAdded }: AddItemFormPropsInterface) => {
+  const [newItemId, setNewItemId] = useState<string|null>(null);
 
   const handleAddItem = async () => {
-    const id = parseInt(newItemId);
+    const id = +newItemId;
     if (isNaN(id) || id <= 0) {
       alert("Введите корректный ID (положительное число)");
       return;
@@ -17,7 +14,7 @@ export const AddItemForm = ({ onItemAdded }: AddItemFormProps) => {
 
     try {
       await itemsApi.addItem(id);
-      setNewItemId("");
+      setNewItemId(null);
       onItemAdded();
     } catch (error) {
       alert(error instanceof Error ? error.message : "Ошибка при добавлении элемента");

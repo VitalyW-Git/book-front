@@ -6,14 +6,15 @@ import { ITEMS_PER_PAGE, FILTER_DEBOUNCE_MS } from "../../common/constants/api";
 
 export const useSelectedItems = () => {
   const [items, setItems] = useState<ItemInterface[]>([]);
-  const [filter, setFilter] = useState<string>("");
+  const [filter, setFilter] = useState<string|null>(null);
   const [selectedOrder, setSelectedOrder] = useState<number[]>([]);
   const [draggedItem, setDraggedItem] = useState<ItemInterface | null>(null);
   const observerRef = useRef<HTMLDivElement>(null);
-  const loadingRef = useRef(false);
-  const filterRef = useRef(filter);
-  const pageRef = useRef(1);
-  const totalRef = useRef(0);
+  const loadingRef = useRef<boolean>(false);
+  const filterRef = useRef<string|null>(filter);
+  const pageRef = useRef<number>(1);
+  const totalRef = useRef<number>(0);
+  const isFirstMountRef = useRef<boolean>(true);
 
   const loadItems = useCallback(
     async (pageNum: number, filterId?: string, reset: boolean = false) => {
@@ -33,6 +34,9 @@ export const useSelectedItems = () => {
         }
         totalRef.current = data.total;
         pageRef.current = pageNum;
+        if (data.items < data.limit) {
+          isFirstMountRef.current = true;
+        }
       } catch (error) {
         console.error("Error loading selected items:", error);
       } finally {
@@ -49,19 +53,16 @@ export const useSelectedItems = () => {
       itemsApi.reorderItems(savedState.selectedOrder).catch(console.error);
     }
     loadItems(1);
-  }, [loadItems]);
+  }, []);
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      loadItems(1, filterRef.current || undefined, true);
-    }, FILTER_DEBOUNCE_MS);
-    return () => clearTimeout(timer);
-  }, [filter, loadItems]);
+    filterRef.current = filter;
+  }, [filter]);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
-        if (entries[0].isIntersecting && items.length < totalRef.current && !loadingRef.current) {
+        if (entries[0].isIntersecting && items.length < totalRef.current && !loadingRef.current && !isFirstMountRef.current) {
           loadItems(pageRef.current + 1, filterRef.current || undefined);
         }
       },
@@ -73,6 +74,17 @@ export const useSelectedItems = () => {
     }
     return () => observer.disconnect();
   }, [loadItems]);
+
+  useEffect(() => {
+    if (isFirstMountRef.current) {
+      isFirstMountRef.current = false;
+      return;
+    }
+    const timer = setTimeout(() => {
+      loadItems(1, filterRef.current || undefined, true);
+    }, FILTER_DEBOUNCE_MS);
+    return () => clearTimeout(timer);
+  }, [filter, loadItems]);
 
   const addItem = useCallback((item: ItemInterface) => {
     setItems((prev) => {
