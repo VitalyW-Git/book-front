@@ -6,15 +6,6 @@ import { AddItemForm } from "../components/AddItemForm";
 import { ItemsList } from "../components/ItemsList";
 import { SelectedItemsList } from "../components/SelectedItemsList";
 
-import type { Route } from "./+types/items";
-
-export function meta({}: Route.MetaArgs) {
-  return [
-    { title: "Items List" },
-    { name: "description", content: "List of 1,000,000 items" },
-  ];
-}
-
 export default function Items() {
   const leftItems = useItems();
   const rightItems = useSelectedItems();
@@ -70,8 +61,6 @@ export default function Items() {
     }
 
     rightItems.reorderItems(
-      rightItems.draggedItem.id,
-      targetItem.id,
       draggedIndex,
       targetIndex
     );

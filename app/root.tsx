@@ -1,5 +1,4 @@
 import {
-  isRouteErrorResponse,
   Links,
   Meta,
   Outlet,
@@ -7,21 +6,7 @@ import {
   ScrollRestoration,
 } from "react-router";
 
-import type { Route } from "./+types/root";
 import "./app.css";
-
-export const links: Route.LinksFunction = () => [
-  { rel: "preconnect", href: "https://fonts.googleapis.com" },
-  {
-    rel: "preconnect",
-    href: "https://fonts.gstatic.com",
-    crossOrigin: "anonymous",
-  },
-  {
-    rel: "stylesheet",
-    href: "https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap",
-  },
-];
 
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
@@ -45,61 +30,4 @@ export default function App() {
   return <Outlet />;
 }
 
-export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
-  // Игнорируем 404 ошибки для системных путей (Chrome DevTools и т.д.)
-  if (isRouteErrorResponse(error) && error.status === 404) {
-    // В режиме разработки тихо игнорируем системные запросы
-    if (import.meta.env.DEV) {
-      // Проверяем, является ли это системным запросом по сообщению об ошибке
-      const errorMessage =
-        error instanceof Error ? error.message : String(error);
-      if (
-        errorMessage.includes(".well-known") ||
-        errorMessage.includes("favicon") ||
-        errorMessage.includes("robots.txt")
-      ) {
-        return null;
-      }
-    }
-  }
 
-  // Также проверяем обычные ошибки на системные пути
-  if (error && error instanceof Error) {
-    const errorMessage = error.message;
-    if (
-      import.meta.env.DEV &&
-      (errorMessage.includes(".well-known") ||
-        errorMessage.includes("No route matches") ||
-        errorMessage.includes("favicon"))
-    ) {
-      return null;
-    }
-  }
-
-  let message = "Oops!";
-  let details = "An unexpected error occurred.";
-  let stack: string | undefined;
-
-  if (isRouteErrorResponse(error)) {
-    message = error.status === 404 ? "404" : "Error";
-    details =
-      error.status === 404
-        ? "The requested page could not be found."
-        : error.statusText || details;
-  } else if (import.meta.env.DEV && error && error instanceof Error) {
-    details = error.message;
-    stack = error.stack;
-  }
-
-  return (
-    <main className="pt-16 p-4 container mx-auto">
-      <h1>{message}</h1>
-      <p>{details}</p>
-      {stack && (
-        <pre className="w-full p-4 overflow-x-auto">
-          <code>{stack}</code>
-        </pre>
-      )}
-    </main>
-  );
-}

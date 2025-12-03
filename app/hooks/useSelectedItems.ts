@@ -134,8 +134,6 @@ export const useSelectedItems = () => {
 
   const reorderItems = useCallback(
     async (
-      draggedItemId: number,
-      targetItemId: number,
       draggedIndex: number,
       targetIndex: number
     ) => {
