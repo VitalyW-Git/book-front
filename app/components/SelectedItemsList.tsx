@@ -36,7 +36,7 @@ export const SelectedItemsList = ({
           value={filter}
           onChange={(e) => onFilterChange(e.target.value)}
           placeholder="Фильтр по ID"
-          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 bg-white"
         />
       </div>
       <div className="h-[600px] overflow-y-auto border border-gray-200 rounded">
