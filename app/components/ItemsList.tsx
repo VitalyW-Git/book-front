@@ -5,7 +5,7 @@ interface ItemsListProps {
   filter: string;
   onFilterChange: (value: string) => void;
   loading: boolean;
-  hasMore: boolean;
+  total: number;
   observerRef: React.RefObject<HTMLDivElement | null>;
   onSelectItem: (item: ItemInterface) => void;
 }
@@ -15,7 +15,7 @@ export const ItemsList = ({
   filter,
   onFilterChange,
   loading,
-  hasMore,
+  total,
   observerRef,
   onSelectItem,
 }: ItemsListProps) => {
@@ -32,7 +32,7 @@ export const ItemsList = ({
         />
       </div>
       <div className="h-[600px] overflow-y-auto border border-gray-200 rounded">
-        {items.map((item) => (
+        {!loading && items.map((item) => (
           <div
             key={item.id}
             className="p-3 border-b border-gray-100 hover:bg-gray-50 flex justify-between items-center"
@@ -47,7 +47,7 @@ export const ItemsList = ({
           </div>
         ))}
         {loading && <div className="p-4 text-center text-gray-500">Загрузка...</div>}
-        {!hasMore && items.length > 0 && (
+        {!loading && items.length === total && (
           <div className="p-4 text-center text-gray-500">Все элементы загружены</div>
         )}
         <div ref={observerRef} className="h-10" />

@@ -83,7 +83,7 @@ export default function Items() {
             filter={leftItems.filter}
             onFilterChange={leftItems.setFilter}
             loading={leftItems.loading}
-            hasMore={leftItems.hasMore}
+            total={leftItems.total}
             observerRef={leftItems.observerRef}
             onSelectItem={handleSelectItem}
           />
@@ -93,7 +93,7 @@ export default function Items() {
             filter={rightItems.filter}
             onFilterChange={rightItems.setFilter}
             loading={rightItems.loading}
-            hasMore={rightItems.hasMore}
+            total={rightItems.total}
             observerRef={rightItems.observerRef}
             draggedItem={rightItems.draggedItem}
             onDeselectItem={handleDeselectItem}

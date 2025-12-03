@@ -5,7 +5,7 @@ interface SelectedItemsListProps {
   filter: string;
   onFilterChange: (value: string) => void;
   loading: boolean;
-  hasMore: boolean;
+  total: number;
   observerRef: React.RefObject<HTMLDivElement | null>;
   draggedItem: ItemInterface | null;
   onDeselectItem: (item: ItemInterface) => void;
@@ -19,7 +19,7 @@ export const SelectedItemsList = ({
   filter,
   onFilterChange,
   loading,
-  hasMore,
+  total,
   observerRef,
   draggedItem,
   onDeselectItem,
@@ -59,7 +59,7 @@ export const SelectedItemsList = ({
           </div>
         ))}
         {loading && <div className="p-4 text-center text-gray-500">Загрузка...</div>}
-        {!hasMore && items.length > 0 && (
+        {items.length === total && items.length > 0 && (
           <div className="p-4 text-center text-gray-500">Все элементы загружены</div>
         )}
         <div ref={observerRef} className="h-10" />

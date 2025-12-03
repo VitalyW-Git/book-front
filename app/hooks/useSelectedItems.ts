@@ -8,7 +8,7 @@ export const useSelectedItems = () => {
   const [items, setItems] = useState<ItemInterface[]>([]);
   const [page, setPage] = useState<number>(1);
   const [filter, setFilter] = useState<string>("");
-  const [hasMore, setHasMore] = useState<boolean>(true);
+  const [total, setTotal] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(false);
   const [selectedOrder, setSelectedOrder] = useState<number[]>([]);
   const [draggedItem, setDraggedItem] = useState<ItemInterface | null>(null);
@@ -16,7 +16,7 @@ export const useSelectedItems = () => {
   const loadingRef = useRef(false);
   const filterRef = useRef(filter);
   const pageRef = useRef(page);
-  const hasMoreRef = useRef(hasMore);
+  const totalRef = useRef(total);
 
   const loadItems = useCallback(
     async (pageNum: number, filterId?: string, reset = false) => {
@@ -36,8 +36,8 @@ export const useSelectedItems = () => {
             return [...prev, ...newItems];
           });
         }
-        setHasMore(data.hasMore);
-        hasMoreRef.current = data.hasMore;
+        setTotal(data.total);
+        totalRef.current = data.total;
         setPage(pageNum);
         pageRef.current = pageNum;
       } catch (error) {
@@ -69,7 +69,7 @@ export const useSelectedItems = () => {
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
-        if (entries[0].isIntersecting && hasMoreRef.current && !loadingRef.current) {
+        if (entries[0].isIntersecting && items.length < totalRef.current && !loadingRef.current) {
           loadItems(pageRef.current + 1, filterRef.current || undefined);
         }
       },
@@ -143,7 +143,7 @@ export const useSelectedItems = () => {
     filter,
     setFilter,
     loading,
-    hasMore,
+    total,
     observerRef,
     selectedOrder,
     draggedItem,

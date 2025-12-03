@@ -5,21 +5,17 @@ import { ITEMS_PER_PAGE, FILTER_DEBOUNCE_MS } from "../../common/constants/api";
 
 export const useItems = () => {
   const [items, setItems] = useState<ItemInterface[]>([]);
-  const [page, setPage] = useState(1);
-  const [filter, setFilter] = useState("");
-  const [hasMore, setHasMore] = useState(true);
-  const [loading, setLoading] = useState(false);
+  const [filter, setFilter] = useState<string>("");
   const observerRef = useRef<HTMLDivElement>(null);
   const loadingRef = useRef(false);
   const filterRef = useRef(filter);
-  const pageRef = useRef(page);
-  const hasMoreRef = useRef(hasMore);
+  const pageRef = useRef(1);
+  const totalRef = useRef(0);
 
   const loadItems = useCallback(
     async (pageNum: number, filterId?: string, reset: boolean = false) => {
       if (loadingRef.current) return;
       loadingRef.current = true;
-      setLoading(true);
 
       try {
         const data = await itemsApi.getItems(pageNum, ITEMS_PER_PAGE, filterId);
@@ -32,16 +28,13 @@ export const useItems = () => {
             return [...prev, ...newItems];
           });
         }
-        console.log(data.hasMore)
-        setHasMore(data.hasMore);
-        hasMoreRef.current = data.hasMore;
-        setPage(pageNum);
+        totalRef.current = data.total;
         pageRef.current = pageNum;
       } catch (error) {
         console.error("Error loading items:", error);
       } finally {
         loadingRef.current = false;
-        setLoading(false);
+
       }
     },
     []
@@ -61,7 +54,7 @@ export const useItems = () => {
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
-        if (entries[0].isIntersecting && hasMoreRef.current && !loadingRef.current) {
+        if (entries[0].isIntersecting && items.length < totalRef.current && !loadingRef.current) {
           loadItems(pageRef.current + 1, filterRef.current || undefined);
         }
       },
@@ -96,8 +89,8 @@ export const useItems = () => {
     items,
     filter,
     setFilter,
-    loading,
-    hasMore,
+    loading: loadingRef.current,
+    total: totalRef.current,
     observerRef,
     removeItem,
     addItem,
