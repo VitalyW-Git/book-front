@@ -118,7 +118,7 @@ export const useSelectedItems = () => {
       updateItems(() => newItems);
 
       try {
-        const state = await itemsApi.fetchBooks();
+        const state = await itemsApi.fetchState();
         const fullOrder = [...state.selectedOrder];
 
         const draggedPosInFull = fullOrder.indexOf(draggedItemId);

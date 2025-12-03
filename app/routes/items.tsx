@@ -49,14 +49,13 @@ export default function Items() {
 
   const handleDrop = (e: React.DragEvent, targetItem: ItemInterface, targetIndex: number) => {
     e.preventDefault();
-    if (!rightItems.draggedItem || rightItems.draggedItem.id === targetItem.id) {
+    if (!rightItems.draggedItem || rightItems.draggedItem?.id === targetItem.id) {
       rightItems.setDraggedItem(null);
       return;
     }
 
     const draggedIndex = rightItems.items.findIndex((item) => item.id === rightItems.draggedItem?.id);
-
-    if (draggedIndex === -1 || targetIndex === -1 || draggedIndex === targetIndex) {
+    if (targetIndex === -1) {
       rightItems.setDraggedItem(null);
       return;
     }

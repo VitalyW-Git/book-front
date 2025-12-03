@@ -69,7 +69,7 @@ export const itemsApi = {
     });
   },
 
-  fetchBooks: async (): Promise<StateResponse> => {
+  fetchState: async (): Promise<StateResponse> => {
     const response = await fetch(`${API_URL}/state`);
     return response.json();
   },
