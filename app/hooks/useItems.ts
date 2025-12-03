@@ -1,17 +1,22 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { ItemInterface } from "../../common/interface";
 import { itemsApi } from "../../common/services/itemsApi";
-import { ITEMS_PER_PAGE, FILTER_DEBOUNCE_MS } from "../../common/constants/api";
+import { ITEMS_PER_PAGE } from "../../common/constants/api";
 
 export const useItems = () => {
-  const [items, setItems] = useState<ItemInterface[]>([]);
+  const [_, setItemsVersion] = useState(0);
   const [filter, setFilter] = useState<string|null>(null);
+  const itemsRef = useRef<ItemInterface[]>([]);
   const observerRef = useRef<HTMLDivElement>(null);
   const loadingRef = useRef<boolean>(false);
   const filterRef = useRef<string|null>(filter);
   const pageRef = useRef<number>(1);
   const totalRef = useRef<number>(0);
-  const isFirstMountRef = useRef<boolean>(true);
+
+  const updateItems = useCallback((updater: (prev: ItemInterface[]) => ItemInterface[]) => {
+    itemsRef.current = updater(itemsRef.current);
+    setItemsVersion(v => v + 1);
+  }, []);
 
   const loadItems = useCallback(
     async (pageNum: number, filterId?: string, reset: boolean = false) => {
@@ -21,23 +26,22 @@ export const useItems = () => {
       try {
         const data = await itemsApi.getItems(pageNum, ITEMS_PER_PAGE, filterId);
         if (reset) {
-          setItems(data.items);
+          updateItems(() => data.items);
         } else {
-          setItems((prev) => {
-            const existingIds = new Set(prev.map((i) => i.id));
-            const newItems = data.items.filter((item) => !existingIds.has(item.id));
-            return [...prev, ...newItems];
-          });
+          const existingIds = new Set(itemsRef.current.map((i) => i.id));
+          const newItems = data.items.filter((item: ItemInterface) => !existingIds.has(item.id));
+          updateItems(prev => [...prev, ...newItems]);
         }
         totalRef.current = data.total;
         pageRef.current = pageNum;
+        console.log(itemsRef.current)
       } catch (error) {
         console.error("Error loading items:", error);
       } finally {
         loadingRef.current = false;
       }
     },
-    []
+    [updateItems]
   );
 
   useEffect(() => {
@@ -51,7 +55,7 @@ export const useItems = () => {
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
-        if (entries[0].isIntersecting && items.length < totalRef.current && !loadingRef.current && !isFirstMountRef.current) {
+        if (entries[0].isIntersecting && itemsRef.current.length < totalRef.current && !loadingRef.current) {
           loadItems(pageRef.current + 1, filterRef.current || undefined);
         }
       },
@@ -65,27 +69,20 @@ export const useItems = () => {
   }, [loadItems]);
 
   useEffect(() => {
-    if (isFirstMountRef.current) {
-      isFirstMountRef.current = false;
+    if (!itemsRef.current?.length) {
       return;
     }
-    const timer = setTimeout(() => {
-      loadItems(1, filterRef.current || undefined, true);
-    }, FILTER_DEBOUNCE_MS);
-    return () => clearTimeout(timer);
+    loadItems(1, filterRef.current || undefined, true);
   }, [filter, loadItems]);
 
   const removeItem = useCallback((itemId: number) => {
-    setItems((prev) => prev.filter((i) => i.id !== itemId));
+    itemsRef.current = itemsRef.current.filter((i) => i.id !== itemId);
   }, []);
 
   const addItem = useCallback((item: ItemInterface) => {
-    setItems((prev) => {
-      if (prev.some((i) => i.id === item.id)) {
-        return prev;
-      }
-      return [...prev, item];
-    });
+    if (!itemsRef.current.some((_item: ItemInterface) => _item.id === item.id)) {
+      itemsRef.current = [...itemsRef.current, item] as ItemInterface[];
+    }
   }, []);
 
   const refresh = useCallback(() => {
@@ -93,9 +90,9 @@ export const useItems = () => {
   }, [filter, loadItems]);
 
   return {
-    items,
     filter,
     setFilter,
+    items: itemsRef.current,
     loading: loadingRef.current,
     total: totalRef.current,
     observerRef,

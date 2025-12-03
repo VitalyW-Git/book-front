@@ -2,10 +2,11 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { ItemInterface } from "../../common/interface";
 import { itemsApi } from "../../common/services/itemsApi";
 import { localStorageService } from "../../common/utils/localStorage";
-import { ITEMS_PER_PAGE, FILTER_DEBOUNCE_MS } from "../../common/constants/api";
+import { ITEMS_PER_PAGE } from "../../common/constants/api";
 
 export const useSelectedItems = () => {
-  const [items, setItems] = useState<ItemInterface[]>([]);
+  const [_, setItemsVersion] = useState(0);
+  const itemsRef = useRef<ItemInterface[]>([]);
   const [filter, setFilter] = useState<string|null>(null);
   const [selectedOrder, setSelectedOrder] = useState<number[]>([]);
   const [draggedItem, setDraggedItem] = useState<ItemInterface | null>(null);
@@ -14,7 +15,11 @@ export const useSelectedItems = () => {
   const filterRef = useRef<string|null>(filter);
   const pageRef = useRef<number>(1);
   const totalRef = useRef<number>(0);
-  const isFirstMountRef = useRef<boolean>(true);
+
+  const updateItems = useCallback((updater: (prev: ItemInterface[]) => ItemInterface[]) => {
+    itemsRef.current = updater(itemsRef.current);
+    setItemsVersion(v => v + 1);
+  }, []);
 
   const loadItems = useCallback(
     async (pageNum: number, filterId?: string, reset: boolean = false) => {
@@ -23,27 +28,24 @@ export const useSelectedItems = () => {
       try {
         const data = await itemsApi.getSelectedItems(pageNum, ITEMS_PER_PAGE, filterId);
         if (reset) {
-          setItems(data.items);
+          updateItems(() => data.items);
           setSelectedOrder(data.order);
         } else {
-          setItems((prev) => {
-            const existingIds = new Set(prev.map((i) => i.id));
-            const newItems = data.items.filter((item) => !existingIds.has(item.id));
-            return [...prev, ...newItems];
-          });
+          const existingIds = new Set(itemsRef.current.map((i) => i.id));
+          const newItems = data.items.filter((item: ItemInterface) => !existingIds.has(item.id));
+          updateItems(prev => [...prev, ...newItems]);
         }
+
         totalRef.current = data.total;
         pageRef.current = pageNum;
-        if (data.items < data.limit) {
-          isFirstMountRef.current = true;
-        }
+        console.log(itemsRef.current)
       } catch (error) {
         console.error("Error loading selected items:", error);
       } finally {
         loadingRef.current = false;
       }
     },
-    []
+    [updateItems]
   );
 
   useEffect(() => {
@@ -62,7 +64,7 @@ export const useSelectedItems = () => {
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
-        if (entries[0].isIntersecting && items.length < totalRef.current && !loadingRef.current && !isFirstMountRef.current) {
+        if (entries[0].isIntersecting && itemsRef.current.length < totalRef.current && !loadingRef.current) {
           loadItems(pageRef.current + 1, filterRef.current || undefined);
         }
       },
@@ -76,48 +78,44 @@ export const useSelectedItems = () => {
   }, [loadItems]);
 
   useEffect(() => {
-    if (isFirstMountRef.current) {
-      isFirstMountRef.current = false;
+    if (!itemsRef.current?.length) {
       return;
     }
-    const timer = setTimeout(() => {
-      loadItems(1, filterRef.current || undefined, true);
-    }, FILTER_DEBOUNCE_MS);
-    return () => clearTimeout(timer);
+    loadItems(1, filterRef.current || undefined, true);
   }, [filter, loadItems]);
 
   const addItem = useCallback((item: ItemInterface) => {
-    setItems((prev) => {
-      if (prev.some((i) => i.id === item.id)) {
+    updateItems((prev: ItemInterface[]) => {
+      if (prev.some((_item: ItemInterface) => _item.id === item.id)) {
         return prev;
       }
       return [...prev, item];
     });
-    setSelectedOrder((prev) => {
+    setSelectedOrder((prev: number[]) => {
       if (prev.includes(item.id)) {
         return prev;
       }
-      const newOrder = [...prev, item.id];
+      const newOrder: number[] = [...prev, item.id];
       localStorageService.saveState({ selectedOrder: newOrder });
       return newOrder;
     });
-  }, []);
+  }, [updateItems]);
 
   const removeItem = useCallback((itemId: number) => {
-    setItems((prev) => prev.filter((i) => i.id !== itemId));
-    setSelectedOrder((prev) => {
-      const newOrder = prev.filter((id) => id !== itemId);
+    updateItems((prev: ItemInterface[]) => prev.filter((i) => i.id !== itemId));
+    setSelectedOrder((prev: number[]) => {
+      const newOrder: number[] = prev.filter((id: number) => id !== itemId);
       localStorageService.saveState({ selectedOrder: newOrder });
       return newOrder;
     });
-  }, []);
+  }, [updateItems]);
 
   const reorderItems = useCallback(
     async (draggedItemId: number, targetItemId: number, draggedIndex: number, targetIndex: number) => {
-      const newItems = [...items];
+      const newItems = [...itemsRef.current];
       const [removed] = newItems.splice(draggedIndex, 1);
       newItems.splice(targetIndex, 0, removed);
-      setItems(newItems);
+      updateItems(() => newItems);
 
       try {
         const state = await itemsApi.fetchBooks();
@@ -138,11 +136,11 @@ export const useSelectedItems = () => {
         console.error("Error reordering items:", error);
       }
     },
-    [items]
+    [updateItems]
   );
 
   return {
-    items,
+    items: itemsRef.current,
     filter,
     setFilter,
     loading: loadingRef.current,
