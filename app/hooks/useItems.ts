@@ -76,12 +76,14 @@ export const useItems = () => {
   }, [filter, loadItems]);
 
   const removeItem = useCallback((itemId: number) => {
-    itemsRef.current = itemsRef.current.filter((i) => i.id !== itemId);
+    console.log(itemId)
+    itemsRef.current = itemsRef.current.filter((item: ItemInterface) => item.id !== itemId);
   }, []);
 
   const addItem = useCallback((item: ItemInterface) => {
     if (!itemsRef.current.some((_item: ItemInterface) => _item.id === item.id)) {
-      itemsRef.current = [...itemsRef.current, item] as ItemInterface[];
+      itemsRef.current = [...itemsRef.current, item]
+        .sort((a: ItemInterface, b: ItemInterface) => a.id - b.id) as ItemInterface[];
     }
   }, []);
 
