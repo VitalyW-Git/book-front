@@ -3,7 +3,7 @@ import { itemsApi } from "../../common/services/itemsApi";
 import { AddItemFormPropsInterface } from "../../common/interface";
 
 export const AddItemForm = ({ onItemAdded }: AddItemFormPropsInterface) => {
-  const [newItemId, setNewItemId] = useState<string>('');
+  const [newItemId, setNewItemId] = useState<string>("");
 
   const handleAddItem = async () => {
     const id = +newItemId;
@@ -14,10 +14,14 @@ export const AddItemForm = ({ onItemAdded }: AddItemFormPropsInterface) => {
 
     try {
       await itemsApi.addItem(id);
-      setNewItemId('');
+      setNewItemId("");
       onItemAdded();
     } catch (error) {
-      alert(error instanceof Error ? error.message : "Ошибка при добавлении элемента");
+      alert(
+        error instanceof Error
+          ? error.message
+          : "Ошибка при добавлении элемента"
+      );
     }
   };
 
@@ -41,4 +45,3 @@ export const AddItemForm = ({ onItemAdded }: AddItemFormPropsInterface) => {
     </div>
   );
 };
-

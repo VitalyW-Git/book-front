@@ -47,14 +47,23 @@ export default function Items() {
     e.preventDefault();
   };
 
-  const handleDrop = (e: React.DragEvent, targetItem: ItemInterface, targetIndex: number) => {
+  const handleDrop = (
+    e: React.DragEvent,
+    targetItem: ItemInterface,
+    targetIndex: number
+  ) => {
     e.preventDefault();
-    if (!rightItems.draggedItem || rightItems.draggedItem?.id === targetItem.id) {
+    if (
+      !rightItems.draggedItem ||
+      rightItems.draggedItem?.id === targetItem.id
+    ) {
       rightItems.setDraggedItem(null);
       return;
     }
 
-    const draggedIndex = rightItems.items.findIndex((item) => item.id === rightItems.draggedItem?.id);
+    const draggedIndex = rightItems.items.findIndex(
+      (item) => item.id === rightItems.draggedItem?.id
+    );
     if (targetIndex === -1) {
       rightItems.setDraggedItem(null);
       return;
@@ -72,7 +81,9 @@ export default function Items() {
   return (
     <div className="min-h-screen bg-gray-50 p-4">
       <div className="max-w-7xl mx-auto">
-        <h1 className="text-3xl font-bold mb-6 text-center">Список элементов</h1>
+        <h1 className="text-3xl font-bold mb-6 text-center">
+          Список элементов
+        </h1>
 
         <AddItemForm onItemAdded={leftItems.refresh} />
 

@@ -2,7 +2,7 @@ import { ItemInterface } from "../../common/interface";
 
 interface ItemsListProps {
   items: ItemInterface[];
-  filter: string|null;
+  filter: string | null;
   onFilterChange: (value: string) => void;
   loading: boolean;
   total: number;
@@ -32,27 +32,31 @@ export const ItemsList = ({
         />
       </div>
       <div className="h-[600px] overflow-y-auto border border-gray-200 rounded">
-        {!loading && items.map((item) => (
-          <div
-            key={item.id}
-            className="p-3 border-b border-gray-100 hover:bg-gray-50 flex justify-between items-center"
-          >
-            <span className="text-gray-700">ID: {item.id}</span>
-            <button
-              onClick={() => onSelectItem(item)}
-              className="px-4 py-1 bg-green-500 text-white rounded hover:bg-green-600 transition"
+        {!loading &&
+          items.map((item) => (
+            <div
+              key={item.id}
+              className="p-3 border-b border-gray-100 hover:bg-gray-50 flex justify-between items-center"
             >
-              Выбрать
-            </button>
-          </div>
-        ))}
-        {loading && <div className="p-4 text-center text-gray-500">Загрузка...</div>}
+              <span className="text-gray-700">ID: {item.id}</span>
+              <button
+                onClick={() => onSelectItem(item)}
+                className="px-4 py-1 bg-green-500 text-white rounded hover:bg-green-600 transition"
+              >
+                Выбрать
+              </button>
+            </div>
+          ))}
+        {loading && (
+          <div className="p-4 text-center text-gray-500">Загрузка...</div>
+        )}
         {!loading && items.length === total && (
-          <div className="p-4 text-center text-gray-500">Все элементы загружены</div>
+          <div className="p-4 text-center text-gray-500">
+            Все элементы загружены
+          </div>
         )}
         <div ref={observerRef} className="h-10" />
       </div>
     </div>
   );
 };
-

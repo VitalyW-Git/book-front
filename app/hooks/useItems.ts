@@ -5,18 +5,21 @@ import { ITEMS_PER_PAGE } from "../../common/constants/api";
 
 export const useItems = () => {
   const [_, setItemsVersion] = useState(0);
-  const [filter, setFilter] = useState<string|null>(null);
+  const [filter, setFilter] = useState<string | null>(null);
   const itemsRef = useRef<ItemInterface[]>([]);
   const observerRef = useRef<HTMLDivElement>(null);
   const loadingRef = useRef<boolean>(false);
-  const filterRef = useRef<string|null>(filter);
+  const filterRef = useRef<string | null>(filter);
   const pageRef = useRef<number>(1);
   const totalRef = useRef<number>(0);
 
-  const updateItems = useCallback((updater: (prev: ItemInterface[]) => ItemInterface[]) => {
-    itemsRef.current = updater(itemsRef.current);
-    setItemsVersion(v => v + 1);
-  }, []);
+  const updateItems = useCallback(
+    (updater: (prev: ItemInterface[]) => ItemInterface[]) => {
+      itemsRef.current = updater(itemsRef.current);
+      setItemsVersion((v) => v + 1);
+    },
+    []
+  );
 
   const loadItems = useCallback(
     async (pageNum: number, filterId?: string, reset: boolean = false) => {
@@ -29,12 +32,14 @@ export const useItems = () => {
           updateItems(() => data.items);
         } else {
           const existingIds = new Set(itemsRef.current.map((i) => i.id));
-          const newItems = data.items.filter((item: ItemInterface) => !existingIds.has(item.id));
-          updateItems(prev => [...prev, ...newItems]);
+          const newItems = data.items.filter(
+            (item: ItemInterface) => !existingIds.has(item.id)
+          );
+          updateItems((prev) => [...prev, ...newItems]);
         }
         totalRef.current = data.total;
         pageRef.current = pageNum;
-        console.log(itemsRef.current)
+        console.log(itemsRef.current);
       } catch (error) {
         console.error("Error loading items:", error);
       } finally {
@@ -55,7 +60,12 @@ export const useItems = () => {
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
-        if (entries[0].isIntersecting && !!itemsRef.current.length && itemsRef.current.length < totalRef.current && !loadingRef.current) {
+        if (
+          entries[0].isIntersecting &&
+          !!itemsRef.current.length &&
+          itemsRef.current.length < totalRef.current &&
+          !loadingRef.current
+        ) {
           loadItems(pageRef.current + 1, filterRef.current || undefined);
         }
       },
@@ -76,14 +86,19 @@ export const useItems = () => {
   }, [filter, loadItems]);
 
   const removeItem = useCallback((itemId: number) => {
-    console.log(itemId)
-    itemsRef.current = itemsRef.current.filter((item: ItemInterface) => item.id !== itemId);
+    console.log(itemId);
+    itemsRef.current = itemsRef.current.filter(
+      (item: ItemInterface) => item.id !== itemId
+    );
   }, []);
 
   const addItem = useCallback((item: ItemInterface) => {
-    if (!itemsRef.current.some((_item: ItemInterface) => _item.id === item.id)) {
-      itemsRef.current = [...itemsRef.current, item]
-        .sort((a: ItemInterface, b: ItemInterface) => a.id - b.id) as ItemInterface[];
+    if (
+      !itemsRef.current.some((_item: ItemInterface) => _item.id === item.id)
+    ) {
+      itemsRef.current = [...itemsRef.current, item].sort(
+        (a: ItemInterface, b: ItemInterface) => a.id - b.id
+      ) as ItemInterface[];
     }
   }, []);
 
@@ -103,4 +118,3 @@ export const useItems = () => {
     refresh,
   };
 };
-

@@ -51,7 +51,8 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
     // В режиме разработки тихо игнорируем системные запросы
     if (import.meta.env.DEV) {
       // Проверяем, является ли это системным запросом по сообщению об ошибке
-      const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
       if (
         errorMessage.includes(".well-known") ||
         errorMessage.includes("favicon") ||

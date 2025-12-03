@@ -2,7 +2,7 @@ import { ItemInterface } from "../../common/interface";
 
 interface SelectedItemsListProps {
   items: ItemInterface[];
-  filter: string|null;
+  filter: string | null;
   onFilterChange: (value: string) => void;
   loading: boolean;
   total: number;
@@ -58,13 +58,16 @@ export const SelectedItemsList = ({
             </button>
           </div>
         ))}
-        {loading && <div className="p-4 text-center text-gray-500">Загрузка...</div>}
+        {loading && (
+          <div className="p-4 text-center text-gray-500">Загрузка...</div>
+        )}
         {items.length === total && items.length > 0 && (
-          <div className="p-4 text-center text-gray-500">Все элементы загружены</div>
+          <div className="p-4 text-center text-gray-500">
+            Все элементы загружены
+          </div>
         )}
         <div ref={observerRef} className="h-10" />
       </div>
     </div>
   );
 };
-

@@ -1,12 +1,20 @@
 import { API_URL } from "../constants/api";
-import { ItemInterface, ItemsResponseInterface, SelectedResponseInterface } from "../interface";
+import {
+  ItemInterface,
+  ItemsResponseInterface,
+  SelectedResponseInterface,
+} from "../interface";
 
 export interface StateResponse {
   selectedOrder: number[];
 }
 
 export const itemsApi = {
-  getItems: async (page: number, limit: number, filterId?: string): Promise<ItemsResponseInterface> => {
+  getItems: async (
+    page: number,
+    limit: number,
+    filterId?: string
+  ): Promise<ItemsResponseInterface> => {
     const params = new URLSearchParams({
       page: page.toString(),
       limit: limit.toString(),
@@ -19,7 +27,11 @@ export const itemsApi = {
     return response.json();
   },
 
-  getSelectedItems: async (page: number, limit: number, filterId?: string): Promise<SelectedResponseInterface> => {
+  getSelectedItems: async (
+    page: number,
+    limit: number,
+    filterId?: string
+  ): Promise<SelectedResponseInterface> => {
     const params = new URLSearchParams({
       page: page.toString(),
       limit: limit.toString(),
@@ -69,4 +81,3 @@ export const itemsApi = {
     });
   },
 };
-
