@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { ItemInterface } from "../../common/interface";
 import { itemsApi } from "../../common/services/itemsApi";
-import { ITEMS_PER_PAGE } from "../../common/constants/api";
+import { ITEMS_PER_PAGE_CONST } from "../../common/constants";
 
 export const useItems = () => {
   const [_, setItemsVersion] = useState(0);
@@ -24,7 +24,7 @@ export const useItems = () => {
       loadingRef.current = true;
 
       try {
-        const data = await itemsApi.getItems(pageNum, ITEMS_PER_PAGE, filterId);
+        const data = await itemsApi.getItems(pageNum, ITEMS_PER_PAGE_CONST, filterId);
         if (reset) {
           updateItems(() => data.items);
         } else {

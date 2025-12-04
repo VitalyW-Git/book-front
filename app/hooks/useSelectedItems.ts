@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { ItemInterface } from "../../common/interface";
 import { itemsApi } from "../../common/services/itemsApi";
 import { localStorageService } from "../../common/utils/localStorage";
-import { ITEMS_PER_PAGE } from "../../common/constants/api";
+import { ITEMS_PER_PAGE_CONST } from "../../common/constants";
 
 export const useSelectedItems = () => {
   const [, setItemsVersion] = useState(0);
@@ -26,7 +26,7 @@ export const useSelectedItems = () => {
       if (loadingRef.current) return;
       loadingRef.current = true;
       try {
-        const data = await itemsApi.getSelectedItems(pageNum, ITEMS_PER_PAGE, filterId);
+        const data = await itemsApi.getSelectedItems(pageNum, ITEMS_PER_PAGE_CONST, filterId);
         if (reset) {
           updateItems(() => data.items);
           setSelectedOrder(data.order);

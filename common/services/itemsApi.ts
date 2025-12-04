@@ -1,4 +1,4 @@
-import { API_URL } from "../constants/api";
+import { API_URL_CONST } from "../constants";
 import { ItemsResponseInterface, SelectedResponseInterface } from "../interface";
 
 export const itemsApi = {
@@ -15,7 +15,7 @@ export const itemsApi = {
       params.append("filterId", filterId);
     }
 
-    const response = await fetch(`${API_URL}?${params}`);
+    const response = await fetch(`${API_URL_CONST}?${params}`);
     return response.json();
   },
 
@@ -32,12 +32,12 @@ export const itemsApi = {
       params.append("filterId", filterId);
     }
 
-    const response = await fetch(`${API_URL}/selected?${params}`);
+    const response = await fetch(`${API_URL_CONST}/selected?${params}`);
     return response.json();
   },
 
   addItem: async (id: number): Promise<void> => {
-    const response = await fetch(`${API_URL}`, {
+    const response = await fetch(`${API_URL_CONST}`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ id }),
@@ -50,7 +50,7 @@ export const itemsApi = {
   },
 
   selectItem: async (id: number): Promise<void> => {
-    await fetch(`${API_URL}/selected`, {
+    await fetch(`${API_URL_CONST}/selected`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ action: "select", id }),
@@ -58,7 +58,7 @@ export const itemsApi = {
   },
 
   deselectItem: async (id: number): Promise<void> => {
-    await fetch(`${API_URL}/selected`, {
+    await fetch(`${API_URL_CONST}/selected`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ action: "deselect", id }),
@@ -66,7 +66,7 @@ export const itemsApi = {
   },
 
   reorderItems: async (order: number[]): Promise<void> => {
-    await fetch(`${API_URL}/selected`, {
+    await fetch(`${API_URL_CONST}/selected`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ action: "reorder", order }),
