@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { ItemInterface } from "../../common/interface";
 import { itemsApi } from "../../common/services/itemsApi";
-import { ITEMS_PER_PAGE_CONST } from "../../common/constants";
+import {FILTER_DEBOUNCE_MS_CONST, ITEMS_PER_PAGE_CONST} from "../../common/constants";
 
 export const useItems = () => {
   const [_, setItemsVersion] = useState(0);
@@ -12,6 +12,7 @@ export const useItems = () => {
   const filterRef = useRef<string | null>(filter);
   const pageRef = useRef<number>(1);
   const totalRef = useRef<number>(0);
+  const isFirstMountRef = useRef<boolean>(true);
 
   const updateItems = useCallback((updater: (prev: ItemInterface[]) => ItemInterface[]) => {
     itemsRef.current = updater(itemsRef.current);
@@ -73,10 +74,14 @@ export const useItems = () => {
   }, [loadItems]);
 
   useEffect(() => {
-    if (!itemsRef.current?.length) {
+    if (isFirstMountRef.current) {
+      isFirstMountRef.current = false;
       return;
     }
-    loadItems(1, filterRef.current || undefined, true);
+    const timer = setTimeout(() => {
+      loadItems(1, filterRef.current || undefined, true);
+    }, FILTER_DEBOUNCE_MS_CONST);
+    return () => clearTimeout(timer);
   }, [filter, loadItems]);
 
   const removeItem = useCallback((itemId: number) => {
