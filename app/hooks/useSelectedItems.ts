@@ -16,32 +16,23 @@ export const useSelectedItems = () => {
   const pageRef = useRef<number>(1);
   const totalRef = useRef<number>(0);
 
-  const updateItems = useCallback(
-    (updater: (prev: ItemInterface[]) => ItemInterface[]) => {
-      itemsRef.current = updater(itemsRef.current);
-      setItemsVersion((v) => v + 1);
-    },
-    []
-  );
+  const updateItems = useCallback((updater: (prev: ItemInterface[]) => ItemInterface[]) => {
+    itemsRef.current = updater(itemsRef.current);
+    setItemsVersion((v) => v + 1);
+  }, []);
 
   const loadItems = useCallback(
     async (pageNum: number, filterId?: string, reset: boolean = false) => {
       if (loadingRef.current) return;
       loadingRef.current = true;
       try {
-        const data = await itemsApi.getSelectedItems(
-          pageNum,
-          ITEMS_PER_PAGE,
-          filterId
-        );
+        const data = await itemsApi.getSelectedItems(pageNum, ITEMS_PER_PAGE, filterId);
         if (reset) {
           updateItems(() => data.items);
           setSelectedOrder(data.order);
         } else {
           const existingIds = new Set(itemsRef.current.map((i) => i.id));
-          const newItems = data.items.filter(
-            (item: ItemInterface) => !existingIds.has(item.id)
-          );
+          const newItems = data.items.filter((item: ItemInterface) => !existingIds.has(item.id));
           updateItems((prev) => [...prev, ...newItems]);
         }
 
@@ -119,9 +110,7 @@ export const useSelectedItems = () => {
 
   const removeItem = useCallback(
     (itemId: number) => {
-      updateItems((prev: ItemInterface[]) =>
-        prev.filter((i) => i.id !== itemId)
-      );
+      updateItems((prev: ItemInterface[]) => prev.filter((i) => i.id !== itemId));
       setSelectedOrder((prev: number[]) => {
         const newOrder: number[] = prev.filter((id: number) => id !== itemId);
         localStorageService.saveState({ selectedOrder: newOrder });
@@ -139,9 +128,7 @@ export const useSelectedItems = () => {
       updateItems(() => newItems);
 
       try {
-        const newOrder: number[] = newItems.map(
-          (item: ItemInterface) => item.id
-        );
+        const newOrder: number[] = newItems.map((item: ItemInterface) => item.id);
         setSelectedOrder(newOrder);
         await itemsApi.reorderItems(newOrder);
         localStorageService.saveState({ selectedOrder: newOrder });

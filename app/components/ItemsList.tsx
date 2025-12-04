@@ -47,13 +47,9 @@ export const ItemsList = ({
               </button>
             </div>
           ))}
-        {loading && (
-          <div className="p-4 text-center text-gray-500">Загрузка...</div>
-        )}
+        {loading && <div className="p-4 text-center text-gray-500">Загрузка...</div>}
         {!loading && items.length === total && (
-          <div className="p-4 text-center text-gray-500">
-            Все элементы загружены
-          </div>
+          <div className="p-4 text-center text-gray-500">Все элементы загружены</div>
         )}
         <div ref={observerRef} className="h-10" />
       </div>

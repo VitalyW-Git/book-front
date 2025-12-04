@@ -1,8 +1,5 @@
 import { API_URL } from "../constants/api";
-import {
-  ItemsResponseInterface,
-  SelectedResponseInterface,
-} from "../interface";
+import { ItemsResponseInterface, SelectedResponseInterface } from "../interface";
 
 export const itemsApi = {
   getItems: async (

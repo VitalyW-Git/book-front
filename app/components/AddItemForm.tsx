@@ -17,11 +17,7 @@ export const AddItemForm = ({ onItemAdded }: AddItemFormPropsInterface) => {
       setNewItemId("");
       onItemAdded();
     } catch (error) {
-      alert(
-        error instanceof Error
-          ? error.message
-          : "Ошибка при добавлении элемента"
-      );
+      alert(error instanceof Error ? error.message : "Ошибка при добавлении элемента");
     }
   };
 

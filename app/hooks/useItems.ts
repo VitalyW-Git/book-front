@@ -13,13 +13,10 @@ export const useItems = () => {
   const pageRef = useRef<number>(1);
   const totalRef = useRef<number>(0);
 
-  const updateItems = useCallback(
-    (updater: (prev: ItemInterface[]) => ItemInterface[]) => {
-      itemsRef.current = updater(itemsRef.current);
-      setItemsVersion((v) => v + 1);
-    },
-    []
-  );
+  const updateItems = useCallback((updater: (prev: ItemInterface[]) => ItemInterface[]) => {
+    itemsRef.current = updater(itemsRef.current);
+    setItemsVersion((v) => v + 1);
+  }, []);
 
   const loadItems = useCallback(
     async (pageNum: number, filterId?: string, reset: boolean = false) => {
@@ -32,9 +29,7 @@ export const useItems = () => {
           updateItems(() => data.items);
         } else {
           const existingIds = new Set(itemsRef.current.map((i) => i.id));
-          const newItems = data.items.filter(
-            (item: ItemInterface) => !existingIds.has(item.id)
-          );
+          const newItems = data.items.filter((item: ItemInterface) => !existingIds.has(item.id));
           updateItems((prev) => [...prev, ...newItems]);
         }
         totalRef.current = data.total;
@@ -85,15 +80,11 @@ export const useItems = () => {
   }, [filter, loadItems]);
 
   const removeItem = useCallback((itemId: number) => {
-    itemsRef.current = itemsRef.current.filter(
-      (item: ItemInterface) => item.id !== itemId
-    );
+    itemsRef.current = itemsRef.current.filter((item: ItemInterface) => item.id !== itemId);
   }, []);
 
   const addItem = useCallback((item: ItemInterface) => {
-    if (
-      !itemsRef.current.some((_item: ItemInterface) => _item.id === item.id)
-    ) {
+    if (!itemsRef.current.some((_item: ItemInterface) => _item.id === item.id)) {
       itemsRef.current = [...itemsRef.current, item].sort(
         (a: ItemInterface, b: ItemInterface) => a.id - b.id
       ) as ItemInterface[];

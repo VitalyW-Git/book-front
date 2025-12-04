@@ -7,7 +7,6 @@ interface SelectedItemsListProps {
   loading: boolean;
   total: number;
   observerRef: React.RefObject<HTMLDivElement | null>;
-  draggedItem: ItemInterface | null;
   onDeselectItem: (item: ItemInterface) => void;
   onDragStart: (item: ItemInterface) => void;
   onDragOver: (e: React.DragEvent) => void;
@@ -21,7 +20,6 @@ export const SelectedItemsList = ({
   loading,
   total,
   observerRef,
-  draggedItem,
   onDeselectItem,
   onDragStart,
   onDragOver,
@@ -58,13 +56,9 @@ export const SelectedItemsList = ({
             </button>
           </div>
         ))}
-        {loading && (
-          <div className="p-4 text-center text-gray-500">Загрузка...</div>
-        )}
+        {loading && <div className="p-4 text-center text-gray-500">Загрузка...</div>}
         {items.length === total && items.length > 0 && (
-          <div className="p-4 text-center text-gray-500">
-            Все элементы загружены
-          </div>
+          <div className="p-4 text-center text-gray-500">Все элементы загружены</div>
         )}
         <div ref={observerRef} className="h-10" />
       </div>
